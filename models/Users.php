@@ -20,6 +20,8 @@ use Yii;
  * @property string $confirmation_sent_at
  * @property string|null $confirmed_at
  * @property int $confirmed
+ *
+ * @property Projects[] $projects
  */
 class Users extends \yii\db\ActiveRecord
 {
@@ -38,10 +40,10 @@ class Users extends \yii\db\ActiveRecord
     {
         return [
             [['email', 'password', 'first_name'], 'required'],
-            [['email', 'first_name', 'last_name', 'company', 'last_sign_in_ip', 'confirmation_token'], 'string'],
+            [['email', 'first_name', 'last_name', 'company', 'last_sign_in_ip'], 'string'],
             [['last_sign_in_at', 'confirmation_sent_at', 'confirmed_at'], 'safe'],
             [['confirmed'], 'integer'],
-            [['password'], 'string', 'max' => 400],
+            [['password', 'login_token', 'confirmation_token'], 'string', 'max' => 400],
         ];
     }
 
@@ -57,6 +59,7 @@ class Users extends \yii\db\ActiveRecord
             'first_name' => 'First Name',
             'last_name' => 'Last Name',
             'company' => 'Company',
+            'login_token' => 'Login Token',
             'last_sign_in_at' => 'Last Sign In At',
             'last_sign_in_ip' => 'Last Sign In Ip',
             'confirmation_token' => 'Confirmation Token',
@@ -64,5 +67,15 @@ class Users extends \yii\db\ActiveRecord
             'confirmed_at' => 'Confirmed At',
             'confirmed' => 'Confirmed',
         ];
+    }
+
+    /**
+     * Gets query for [[Projects]].
+     *
+     * @return \yii\db\ActiveQuery
+     */
+    public function getProjects()
+    {
+        return $this->hasMany(Projects::className(), ['user_id' => 'uid']);
     }
 }
