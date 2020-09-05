@@ -11,11 +11,13 @@ use Yii;
  * @property int $user_id
  * @property string $name
  * @property int|null $project_logo
+ * @property string|null $special_link
  *
  * @property Floors[] $floors
  * @property Galleries[] $galleries
  * @property Maps[] $maps
  * @property Users $user
+ * @property Images $projectLogo
  */
 class Projects extends \yii\db\ActiveRecord
 {
@@ -36,7 +38,9 @@ class Projects extends \yii\db\ActiveRecord
             [['user_id', 'name'], 'required'],
             [['user_id', 'project_logo'], 'integer'],
             [['name'], 'string', 'max' => 128],
+            [['special_link'], 'string', 'max' => 400],
             [['user_id'], 'exist', 'skipOnError' => true, 'targetClass' => Users::className(), 'targetAttribute' => ['user_id' => 'uid']],
+            [['project_logo'], 'exist', 'skipOnError' => true, 'targetClass' => Images::className(), 'targetAttribute' => ['project_logo' => 'id']],
         ];
     }
 
@@ -50,6 +54,7 @@ class Projects extends \yii\db\ActiveRecord
             'user_id' => 'User ID',
             'name' => 'Name',
             'project_logo' => 'Project Logo',
+            'special_link' => 'Special Link',
         ];
     }
 
@@ -91,5 +96,15 @@ class Projects extends \yii\db\ActiveRecord
     public function getUser()
     {
         return $this->hasOne(Users::className(), ['uid' => 'user_id']);
+    }
+
+    /**
+     * Gets query for [[ProjectLogo]].
+     *
+     * @return \yii\db\ActiveQuery
+     */
+    public function getProjectLogo()
+    {
+        return $this->hasOne(Images::className(), ['id' => 'project_logo']);
     }
 }

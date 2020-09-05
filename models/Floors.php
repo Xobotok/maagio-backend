@@ -79,4 +79,7 @@ class Floors extends \yii\db\ActiveRecord
     {
         return $this->hasMany(Units::className(), ['floor_id' => 'id']);
     }
+    public function createFloor($floor) {
+
+    }
 }

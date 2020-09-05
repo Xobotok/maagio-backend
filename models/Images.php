@@ -8,7 +8,7 @@ use Yii;
  * This is the model class for table "images".
  *
  * @property int $id
- * @property string $image_name
+ * @property string $name
  * @property string $image_link
  *
  * @property Floors[] $floors
@@ -30,8 +30,8 @@ class Images extends \yii\db\ActiveRecord
     public function rules()
     {
         return [
-            [['image_name', 'image_link'], 'required'],
-            [['image_name', 'image_link'], 'string', 'max' => 400],
+            [['name', 'image_link'], 'required'],
+            [['name', 'image_link'], 'string', 'max' => 400],
         ];
     }
 
@@ -42,7 +42,7 @@ class Images extends \yii\db\ActiveRecord
     {
         return [
             'id' => 'ID',
-            'image_name' => 'Image Name',
+            'name' => 'Name',
             'image_link' => 'Image Link',
         ];
     }

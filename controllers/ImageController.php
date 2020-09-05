@@ -2,6 +2,7 @@
 
 namespace app\controllers;
 
+use app\models\Images;
 use app\models\Users;
 use MailSender;
 use phpDocumentor\Reflection\Types\Null_;
@@ -20,6 +21,10 @@ class ImageController extends BaseController
         return [
             '*',                        // star allows all domains
         ];
+    }
+    public static function createImage($name, $path) {
+        $model = new Images();
+        $model->name = $name;
     }
     public function actionIndex() {
 
