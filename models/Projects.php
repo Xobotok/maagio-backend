@@ -12,6 +12,7 @@ use Yii;
  * @property string $name
  * @property int|null $project_logo
  * @property string|null $special_link
+ * @property int $published
  *
  * @property Floors[] $floors
  * @property Galleries[] $galleries
@@ -36,7 +37,7 @@ class Projects extends \yii\db\ActiveRecord
     {
         return [
             [['user_id', 'name'], 'required'],
-            [['user_id', 'project_logo'], 'integer'],
+            [['user_id', 'project_logo', 'published'], 'integer'],
             [['name'], 'string', 'max' => 128],
             [['special_link'], 'string', 'max' => 400],
             [['user_id'], 'exist', 'skipOnError' => true, 'targetClass' => Users::className(), 'targetAttribute' => ['user_id' => 'uid']],
@@ -55,6 +56,7 @@ class Projects extends \yii\db\ActiveRecord
             'name' => 'Name',
             'project_logo' => 'Project Logo',
             'special_link' => 'Special Link',
+            'published' => 'Published',
         ];
     }
 

@@ -137,6 +137,7 @@ class ProjectController extends BaseController
         }
         $project_link = md5($project_model->id . $project_model->name) . $project_model->id;
         $project_model->special_link = $project_link;
+        $project_model->published = 1;
         $project_model->save();
         $result->ok = 1;
         $result->project_link = $project_link;
