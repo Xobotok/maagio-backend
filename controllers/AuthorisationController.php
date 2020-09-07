@@ -5,7 +5,10 @@ namespace app\controllers;
 use app\models\Users;
 use MailSender;
 use phpDocumentor\Reflection\Types\Null_;
+use Swift_Plugins_LoggerPlugin;
+use Swift_Plugins_Loggers_ArrayLogger;
 use Yii;
+use yii\db\Exception;
 use yii\filters\AccessControl;
 use yii\web\Controller;
 use yii\web\Response;
@@ -61,12 +64,24 @@ class AuthorisationController extends BaseController
             $user->confirmation_sent_at = date('Y-m-d H:i:s');
             $user->confirmation_token = md5($data->email) . time();
             $user->save();
-            Yii::$app->mailer->compose()
+
+            $logger = new Swift_Plugins_Loggers_ArrayLogger();
+            $mailer = Yii::$app->get('mailer');
+            $message  = Yii::$app->mailer->compose()
                 ->setFrom(['maagio@bk.ru' => 'Maagio account confirm'])
                 ->setTo($user->email)
                 ->setSubject('Welcome to Maagio')
-                ->setHtmlBody('<p>For activate your Maagio Account click </p><b><a href="http://hareapj.cluster051.hosting.ovh.net/#/confirm/?confirm_token='.$user->confirmation_token.'">here</a></b>')
-                ->send();
+                ->setHtmlBody('<p>For activate your Maagio Account click </p><b><a href="http://hareapj.cluster051.hosting.ovh.net/#/confirm/?confirm_token='.$user->confirmation_token.'">here</a></b>');
+            $mailer->getSwiftMailer()->registerPlugin(new Swift_Plugins_LoggerPlugin($logger));
+            try{
+                $message->send();
+            }   catch(\Swift_SwiftException $exception) {
+                $result->ok = 0;
+                $result->error = "Can't send activate email. Check your email address";
+                $user->delete();
+                return json_encode($result);
+            }
+
             $result->ok = 1;
             $result->message = 'Confirm your email address and log in';
         }
