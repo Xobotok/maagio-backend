@@ -83,12 +83,14 @@ class AuthorisationController extends BaseController
             $user->confirmation_sent_at =  date('Y-m-d H:i:s');
             $user->save();
             $result->ok = 1;
+            $result->user = (object)[];
             $result->user->name = $user->first_name;
             $result->user->last_name = $user->last_name;
             $result->user->email = $user->email;
             $result->user->uid = $user->uid;
             $result->user->company = $user->company;
             $result->token = $user->login_token;
+
         } else {
             $user = $model->findOne(['email' => $data->email, 'password' => md5($data->password)]);
             if($user != NULL) {

@@ -25,8 +25,10 @@ class BaseController extends Controller
      function checkAuthorisation($uid, $token) {
         $model = new Users();
         $result = (object)[];
-        if($model->find()->where(['uid'=>$uid, 'login_token' => $token])->one() === NULL) {
+        $user = $model->find()->where(['uid'=>(int)$uid, 'login_token' => $token])->one();
+        if($user === NULL) {
             $result->ok = 0;
+            $result->user = $user;
             $result->error = 'Authorisation failed. Wrong user_id or token';
         } else {
             $result->ok = 1;

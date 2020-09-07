@@ -38,6 +38,30 @@ class ProjectController extends BaseController
         $model->save();
         return $model;
     }
+    public function actionGetUserProjects() {
+        $data = (object)yii::$app->request->get();
+        $result = (object)[];
+        $model = new Users();
+        $user = $model->find()->where(['uid' => $data->user_id, 'login_token' => $data->token])->one();
+        if($user !== NULL) {
+            $model = new Projects();
+            $projects = $model->find()->where(['user_id' => $data->user_id])->asArray()->all();
+            foreach ($projects as $key => $project) {
+                $model = new Images();
+                $model = $model->find()->where(['id'=>$project['project_logo']])->asArray()->one();
+                if($model !== NULL) {
+                    $projects[$key]['project_logo'] = $model['image_link'];
+                }
+
+            }
+            $result->ok = 1;
+            $result->data = $projects;
+        } else {
+            $result->ok = 0;
+            $result->error = 'User not found';
+        }
+        return json_encode($result);
+    }
     public function actionSaveNewProject()
     {
         $result = (object)[];
@@ -55,10 +79,6 @@ class ProjectController extends BaseController
         $project_model = self::createProject($user_id, $project);
         if(count($_FILES) > 0) {
             $files = $_FILES;
-            // ВАЖНО! тут должны быть все проверки безопасности передавемых файлов и вывести ошибки если нужн
-            $uploaddir = '../image_storage/uploads'; // . - текущая папка где находится submit.php
-            // cоздадим папку если её нет
-            if( ! is_dir( $uploaddir ) ) mkdir( $uploaddir, 0777 );
             foreach ($files as $key => $file) {
                 $findme   = 'floor';
                 $pos = strpos($key, $findme);
@@ -107,18 +127,10 @@ class ProjectController extends BaseController
             $model = GalleryController::createGallery($project_id, $gallery->name);
             GalleryController::uploadPhotos($user_id, $project_id, $model->id, $gallery_images[$key]);
         }
+
         if(isset($_FILES['logo']) && $_FILES['logo'] !== '') {
-            $user_folder = '../image_storage/uploads/user_' . $user_id;
-            if( ! is_dir( $user_folder ) ) mkdir( $user_folder, 0777 );
-            $project_folder = $user_folder . '/project_'.$project_id;
-            if( ! is_dir( $project_folder ) ) mkdir( $project_folder, 0777 );
-            $file_name = $project_id . '_logo';
-            if( move_uploaded_file( $_FILES['logo']['tmp_name'], "$project_folder/$file_name" ) ){
-                $done_files[] = realpath( "$project_folder/$file_name" );
-                $image = new Images();
-                $image->image_link = realpath( "$project_folder/$file_name" );
-                $image->name = $_FILES['logo']['name'];
-                $image->save();
+           $image = ImageController::uploadImage($user_id, $project_id, 'logo',$_FILES['logo']);
+            if( $image !== false &&  isset($image->id) ){
                 $project_model->project_logo = $image->id;
                 $project_model->save();
             }

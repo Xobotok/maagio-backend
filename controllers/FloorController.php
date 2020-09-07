@@ -32,21 +32,9 @@ class FloorController extends BaseController
     public static function uploadFloorImage($user_id, $project_id, $floor_id, $floor_image) {
         $model = new Floors();
         $model = $model->findOne($floor_id);
-        $user_folder = '../image_storage/uploads/user_' . $user_id;
-        if( ! is_dir( $user_folder ) ) mkdir( $user_folder, 0777 );
-        $project_folder = $user_folder . '/project_'.$project_id;
-        if( ! is_dir( $project_folder ) ) mkdir( $project_folder, 0777 );
-        $floor_folder = $project_folder . '/floors/';
-        if( ! is_dir( $floor_folder ) ) mkdir( $floor_folder, 0777 );
-        $file_name = $floor_id.'_'.$floor_image['name'];
-
-        if( move_uploaded_file( $floor_image['tmp_name'], "$floor_folder/$file_name" ) ){
-            $done_files[] = realpath( "$floor_folder/$file_name" );
-            $image = new Images();
-            $image->image_link = realpath( "$floor_folder/$file_name" );
-            $image->name = $floor_image['name'];
-            $image->save();
-            $model->image_id = $image->id;
+        $floor_image = ImageController::uploadImage($user_id, $project_id, 'floor', $floor_image, $floor_id);
+        if(isset($floor_image->id)) {
+            $model->image_id = $floor_image->id;
             $model->save();
         }
         return $model;
