@@ -19,12 +19,19 @@ use app\models\ContactForm;
 class FloorController extends BaseController
 {
     public $enableCsrfValidation = false;
-    public static function createFloor($project_id, $floor) {
+    public static function createFloor($user_id,$project_id, $floor) {
         $model = new Floors();
         $model->project_id = $project_id;
         $model->save();
         foreach($floor->units as $unit) {
-            $floor = UnitController::createUnit((int)$model->id, $unit);
+            $unitCont = UnitController::createUnit((int)$model->id, $unit);
+            if(isset($unit->image) && count($unit->image) > 0) {
+                $image = ImageController::uploadImage($user_id, $project_id, 'unit', $unit->image, $floor->id,'', $unitCont->id);
+                if(isset($image->id)) {
+                    $unitCont->image_id = $image->id;
+                    $unitCont->save();
+                }
+            }
         }
         return $model;
 

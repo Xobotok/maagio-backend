@@ -60,7 +60,7 @@ class ImageController extends BaseController
         }
         return $result;
     }
-    public static function uploadImage($user_id, $project_id, $type, $image, $floor_id = '', $gallery_id = '') {
+    public static function uploadImage($user_id, $project_id, $type, $image, $floor_id = '', $gallery_id = '', $unit_id ='') {
         $checkImage = ImageController::checkImage($image);
         if($checkImage != true) {
             return $checkImage;
@@ -78,10 +78,11 @@ class ImageController extends BaseController
             $file_name = $user_id . '_' .$project_id . '_floor_'.$floor_id . '_' . $image['size'].$image['name'];
         } else if($type === 'gallery_image') {
             $file_name = $user_id . '_' .$project_id . '_gallery_'.$gallery_id . '_' . $image['size'].$image['name'];
+        } else if($type === 'unit') {
+            $file_name = $user_id . '_' .$project_id . '_floor_'.$floor_id . 'unit_' .$unit_id .'_'. $image['size'].$image['name'];
         } else {
             return false;
         }
-
         if( move_uploaded_file( $image['tmp_name'], "$uploaddir/$file_name" ) ){
             $done_files[] = realpath( "$uploaddir/$file_name" );
             $image_model = new Images();

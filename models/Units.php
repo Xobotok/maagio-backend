@@ -21,8 +21,10 @@ use Yii;
  * @property int|null $hoa
  * @property string|null $mark_x
  * @property string|null $mark_y
+ * @property int|null $image_id
  *
  * @property Floors $floor
+ * @property Images $image
  */
 class Units extends \yii\db\ActiveRecord
 {
@@ -41,9 +43,10 @@ class Units extends \yii\db\ActiveRecord
     {
         return [
             [['floor_id', 'unit_number', 'price', 'int_sq', 'bad', 'bath'], 'required'],
-            [['floor_id', 'unit_number', 'status', 'price', 'int_sq', 'ext_sq', 'bad', 'bath', 'bmr', 'parking', 'hoa'], 'integer'],
+            [['floor_id', 'unit_number', 'status', 'price', 'int_sq', 'ext_sq', 'bad', 'bath', 'bmr', 'parking', 'hoa', 'image_id'], 'integer'],
             [['mark_x', 'mark_y'], 'string', 'max' => 128],
             [['floor_id'], 'exist', 'skipOnError' => true, 'targetClass' => Floors::className(), 'targetAttribute' => ['floor_id' => 'id']],
+            [['image_id'], 'exist', 'skipOnError' => true, 'targetClass' => Images::className(), 'targetAttribute' => ['image_id' => 'id']],
         ];
     }
 
@@ -67,6 +70,7 @@ class Units extends \yii\db\ActiveRecord
             'hoa' => 'Hoa',
             'mark_x' => 'Mark X',
             'mark_y' => 'Mark Y',
+            'image_id' => 'Image ID',
         ];
     }
 
@@ -78,5 +82,15 @@ class Units extends \yii\db\ActiveRecord
     public function getFloor()
     {
         return $this->hasOne(Floors::className(), ['id' => 'floor_id']);
+    }
+
+    /**
+     * Gets query for [[Image]].
+     *
+     * @return \yii\db\ActiveQuery
+     */
+    public function getImage()
+    {
+        return $this->hasOne(Images::className(), ['id' => 'image_id']);
     }
 }

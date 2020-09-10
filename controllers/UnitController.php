@@ -44,7 +44,6 @@ class UnitController extends BaseController
 
             $floor->save();
             return $floor;
-
     }
     public function actionGetBuildings() {
 
