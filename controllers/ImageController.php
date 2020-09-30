@@ -60,6 +60,18 @@ class ImageController extends BaseController
         }
         return $result;
     }
+    public static function removeImage($image_id) {
+        $file = Images::findOne($image_id);
+        $result = (object)[];
+        $filename = explode('/image_storage/uploads/',$file['image_link'])[1];
+        $filePath = './image_storage/uploads/'.$filename;
+        if(file_exists($filePath)) {
+            unlink($filePath);
+        }
+        $file->delete();
+        $result->ok = 1;
+        return $result;
+    }
     public static function uploadImage($user_id, $project_id, $type, $image, $floor_id = '', $gallery_id = '', $unit_id ='') {
         $checkImage = ImageController::checkImage($image);
         if($checkImage != true) {
@@ -83,6 +95,7 @@ class ImageController extends BaseController
         } else {
             return false;
         }
+        $file_name = str_replace(' ', '', $file_name);
         if( move_uploaded_file( $image['tmp_name'], "$uploaddir/$file_name" ) ){
             $done_files[] = realpath( "$uploaddir/$file_name" );
             $image_model = new Images();

@@ -34,9 +34,9 @@ $config = [
             'useFileTransport' => false,
             'transport' => [
                 'class' => 'Swift_SmtpTransport',
-                'host' => 'smtp.mail.ru',  // e.g. smtp.mandrillapp.com or smtp.gmail.com
-                'username' => 'maagio@bk.ru',
-                'password' => '2486066Ab',
+                'host' => 'smtp.gmail.com',  // e.g. smtp.mandrillapp.com or smtp.gmail.com
+                'username' => 'no-reply@maggio.app',
+                'password' => 'G>)(R7rmC',
                 'port' => '465 ', // Port 25 is a very common port too
                 'encryption' => 'ssl', // It is often used, check your provider or mail server specs
             ],

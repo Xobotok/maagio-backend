@@ -63,12 +63,10 @@ class AuthorisationController extends BaseController
             $user->last_sign_in_at = date('Y-m-d H:i:s');
             $user->confirmation_sent_at = date('Y-m-d H:i:s');
             $user->confirmation_token = md5($data->email) . time();
-            $user->save();
-
             $logger = new Swift_Plugins_Loggers_ArrayLogger();
             $mailer = Yii::$app->get('mailer');
             $message  = Yii::$app->mailer->compose()
-                ->setFrom(['maagio@bk.ru' => 'Maagio account confirm'])
+                ->setFrom(['no-reply@maggio.app' => 'Maagio account confirm'])
                 ->setTo($user->email)
                 ->setSubject('Welcome to Maagio')
                 ->setHtmlBody('<p>For activate your Maagio Account click </p><b><a href="http://hareapj.cluster051.hosting.ovh.net/#/confirm/?confirm_token='.$user->confirmation_token.'">here</a></b>');
@@ -81,6 +79,7 @@ class AuthorisationController extends BaseController
                 $user->delete();
                 return json_encode($result);
             }
+            $user->save();
 
             $result->ok = 1;
             $result->message = 'Confirm your email address and log in';
@@ -105,7 +104,7 @@ class AuthorisationController extends BaseController
             $result->user->uid = $user->uid;
             $result->user->company = $user->company;
             $result->token = $user->login_token;
-
+            $result->user->paid = strtotime($user->paid_up_to);
         } else {
             $user = $model->findOne(['email' => $data->email, 'password' => md5($data->password)]);
             if($user != NULL) {

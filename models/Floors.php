@@ -10,6 +10,7 @@ use Yii;
  * @property int $id
  * @property int $project_id
  * @property int|null $image_id
+ * @property int $number
  *
  * @property Projects $project
  * @property Images $image
@@ -31,8 +32,8 @@ class Floors extends \yii\db\ActiveRecord
     public function rules()
     {
         return [
-            [['project_id'], 'required'],
-            [['project_id', 'image_id'], 'integer'],
+            [['project_id', 'number'], 'required'],
+            [['project_id', 'image_id', 'number'], 'integer'],
             [['project_id'], 'exist', 'skipOnError' => true, 'targetClass' => Projects::className(), 'targetAttribute' => ['project_id' => 'id']],
             [['image_id'], 'exist', 'skipOnError' => true, 'targetClass' => Images::className(), 'targetAttribute' => ['image_id' => 'id']],
         ];
@@ -47,6 +48,7 @@ class Floors extends \yii\db\ActiveRecord
             'id' => 'ID',
             'project_id' => 'Project ID',
             'image_id' => 'Image ID',
+            'number' => 'Number',
         ];
     }
 
@@ -78,8 +80,5 @@ class Floors extends \yii\db\ActiveRecord
     public function getUnits()
     {
         return $this->hasMany(Units::className(), ['floor_id' => 'id']);
-    }
-    public function createFloor($floor) {
-
     }
 }
