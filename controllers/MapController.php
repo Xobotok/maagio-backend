@@ -33,6 +33,10 @@ class MapController extends BaseController
         $datamap = json_decode($data->map);
         $map = Maps::find()->where(['project_id' => $data->project_id])->asArray()->one();
         $map = Maps::findOne($map['id']);
+        if($map == null) {
+            $map = new Maps();
+            $map->project_id = $data->project_id;
+        }
         $map->lat = (string)$datamap->lat;
         $map->lng = (string)$datamap->lng;
         $map->save();

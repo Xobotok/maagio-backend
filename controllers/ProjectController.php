@@ -125,7 +125,7 @@ class ProjectController extends BaseController
         if ($authorisation->ok === 0) {
             return json_encode($authorisation);
         }
-        if($data->project_id && $data->project_id) {
+        if(isset($data->project_id) && $data->project_id != null) {
             $project = Projects::findOne($data->project_id);
         } else {
             $project = new Projects();
@@ -148,44 +148,6 @@ class ProjectController extends BaseController
         $result->ok = 1;
         $result->project = $project->attributes;
         return json_encode($result);
-    }
-    public function actionUpdateFloorPlates() {
-        $result = (object)[];
-        $data = (object)yii::$app->request->post();
-        $authorisation = $this->checkAuthorisation($data->user_id, $data->token);
-        if ($authorisation->ok === 0) {
-            return json_encode($authorisation);
-        }
-        if($data->project_id) {
-            $project = Projects::findOne($data->project_id);
-        } else {
-            $result->ok = 0;
-            $result->message = 'Project not found';
-        }
-        $images = [];
-        foreach ($_FILES as $key => $file) {
-            $images[explode('floor_images_', $key)[1]] = $file;
-        }
-        $floors = json_decode($data->floors);
-        foreach ($floors as $key => $floor) {
-            if(isset($floor->id)) {
-                $floorModel = Floors::findOne($floor->id);
-            } else {
-                $floorModel = new Floors();
-                $floorModel->project_id = $data->project_id;
-                $floorModel->save();
-            }
-            $floorModel->number = $floor->number;
-            if(isset($images[$key])) {
-                if($floorModel->image_id != null) {
-                    ImageController::removeImage($floorModel->image_id);
-                }
-                $img = ImageController::uploadImage($data->user_id, $data->project_id, 'floor', $images[$key], $floorModel->id, '', '');
-                $floorModel->image_id = $img->id;
-            }
-            $floorModel->save();
-        }
-
     }
     public function actionSaveNewProject()
     {

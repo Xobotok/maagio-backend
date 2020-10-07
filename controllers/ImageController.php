@@ -13,8 +13,8 @@ use yii\web\Response;
 use yii\filters\VerbFilter;
 use app\models\LoginForm;
 use app\models\ContactForm;
-/*const PATH_TO_IMAGE = 'http://a0466733.xsph.ru/image_storage/uploads/';*/
-const PATH_TO_IMAGE = 'http://web/image_storage/uploads/';
+const PATH_TO_IMAGE = 'https://backend.getmaggio.com/web/image_storage/uploads/';
+/*const PATH_TO_IMAGE = 'http://web/image_storage/uploads/';*/
 
 class ImageController extends BaseController
 {
