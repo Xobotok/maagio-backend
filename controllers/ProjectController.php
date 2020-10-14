@@ -420,6 +420,7 @@ class ProjectController extends BaseController
         $project['floors'] = FloorController::getFloor($project['id']);
         $project['galleries'] = GalleryController::getGalleries($project['id']);
         $unfloorUnits = UnitController::getUnfloorUnits($project['id']);
+        $project['markers'] = MarkerController::getMarkers($project['id']);
         if($unfloorUnits != null) {
             $project['unfloor_units'] = $unfloorUnits;
         } else {
