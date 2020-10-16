@@ -23,39 +23,62 @@ class MapController extends BaseController
 {
     public $enableCsrfValidation = false;
 
-    public function actionUpdateMap()
-    {
+    public function actionSearchAddress() {
         $result = (object)[];
         $data = (object)yii::$app->request->post();
         $authorisation = $this->checkAuthorisation($data->user_id, $data->token);
         if ($authorisation->ok === 0) {
             return json_encode($authorisation);
         }
-        $datamap = json_decode($data->map);
         $map = Maps::find()->where(['project_id' => $data->project_id])->asArray()->one();
-        $map = Maps::findOne($map['id']);
-        if($map == null) {
-            $map = new Maps();
-            $map->project_id = $data->project_id;
-        }
-        if($map->lat == (string)$datamap->lat && $map->lng == (string)$datamap->lng) {
-            $map->lat = (string)$datamap->lat;
-            $map->lng = (string)$datamap->lng;
-            $map->save();
+        if(isset($map['id'])) {
+            $map = Maps::findOne($map['id']);
         } else {
-            $map->lat = (string)$datamap->lat;
-            $map->lng = (string)$datamap->lng;
-            $map->save();
-            $markers = MapMarkers::find()->where(['project_id' => $data->project_id, 'creator' => 1])->asArray()->all();
-            foreach ($markers as $marker) {
-                $map_marker = MapMarkers::findOne($marker['id']);
-                $map_marker->delete();
-            }
-          MarkerController::CreateMarkers($map->lat, $map->lng, $data->project_id);
+            $map = new Maps();
         }
-        $result->ok = 1;
-        $result->map = $map;
+        $new_map =  'https://maps.googleapis.com/maps/api/geocode/json?address=' . urlencode($data->address) . '&key=AIzaSyDEzKHEUbk3ocLvIgBGMOsJjguHEj0LR4s';
+        $new_map = file_get_contents($new_map);
+        $new_map = json_decode($new_map);
+        $new_lat ='';
+        $new_lng = '';
+        $new_address = '';
+        if(isset($new_map->results[0]->geometry->location->lat)) {
+            $new_lat = (string)$new_map->results[0]->geometry->location->lat;
+        }
+        if(isset($new_map->results[0]->geometry->location->lng)) {
+            $new_lng = (string)$new_map->results[0]->geometry->location->lng;
+        }
+        if(isset($new_map->results[0]->formatted_address)) {
+            $new_address = $new_map->results[0]->formatted_address;
+        }
+        if($new_lat != '' && $map->lat != $new_lat) {
+            $map->lat = $new_lat;
+            $map->lng = $new_lng;
+            $map->address = $new_address;
+            $map->save();
+            $result->ok = 1;
+            $result->map = $map->attributes;
+            MarkerController::CreateMarkers($map->lat, $map->lng, $data->project_id);
+            return json_encode($result);
+        }
+        $result->ok = 0;
+        $result->map = 'The same address';
         return json_encode($result);
+    }
+    public function actionSearchPlace() {
+        $data = (object)yii::$app->request->post();
+        $query = 'https://maps.googleapis.com/maps/api/geocode/json?address=' . $data->input . '&key=AIzaSyDEzKHEUbk3ocLvIgBGMOsJjguHEj0LR4s';
+        $result = file_get_contents($query);
+        $result = json_decode($result);
+        $data = (object)[];
+        if(isset($result->status) && $result->status == 'OK') {
+            $data->result = $result->results;
+            $data->ok = 1;
+        } else {
+            $data->ok = 0;
+            $data->message = 'Nothing found';
+        }
+        return json_encode($data);
     }
     public function actionSearchNearPlaces() {
         $query = 'https://maps.googleapis.com/maps/api/place/nearbysearch/json?location=-33.8670522,151.1957362&radius=500&type=food&key=AIzaSyDEzKHEUbk3ocLvIgBGMOsJjguHEj0LR4s';

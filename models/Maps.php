@@ -9,6 +9,7 @@ use Yii;
  *
  * @property int $id
  * @property int $project_id
+ * @property string|null $address
  * @property string $lat
  * @property string $lng
  *
@@ -32,6 +33,7 @@ class Maps extends \yii\db\ActiveRecord
         return [
             [['project_id', 'lat', 'lng'], 'required'],
             [['project_id'], 'integer'],
+            [['address'], 'string', 'max' => 400],
             [['lat', 'lng'], 'string', 'max' => 128],
             [['project_id'], 'exist', 'skipOnError' => true, 'targetClass' => Projects::className(), 'targetAttribute' => ['project_id' => 'id']],
         ];
@@ -45,6 +47,7 @@ class Maps extends \yii\db\ActiveRecord
         return [
             'id' => 'ID',
             'project_id' => 'Project ID',
+            'address' => 'Address',
             'lat' => 'Lat',
             'lng' => 'Lng',
         ];

@@ -6,6 +6,7 @@ use app\models\Floors;
 use app\models\Galleries;
 use app\models\GalleryPhotos;
 use app\models\Images;
+use app\models\MapMarkers;
 use app\models\Maps;
 use app\models\Projects;
 use app\models\Units;
@@ -332,6 +333,8 @@ class ProjectController extends BaseController
             $map['lat'] = (double)$map['lat'];
         }
         $project['map'] = $map;
+        $project['markers']['user_marker'] = MapMarkers::find()->where(['project_id' => $project['id'], 'creator' => 0])->asArray()->all();
+        $project['markers']['automation_marker'] = MapMarkers::find()->where(['project_id' => $project['id'], 'creator' => 1, 'show_marker' => 1])->asArray()->all();
         $result->ok = 1;
         $result->data = $project;
         return json_encode($result);
@@ -433,6 +436,7 @@ class ProjectController extends BaseController
             $project['map']['lat'] = (double)$map['lat'];
             $project['map']['lng'] = (double)$map['lng'];
             $project['map']['id'] = $map['id'];
+            $project['map']['address'] = $map['address'];
         } else {
             $project['map'] = '';
         }
