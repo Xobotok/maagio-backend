@@ -13,17 +13,17 @@ use Yii;
  * @property int $unit_number
  * @property int $status 0 - available, 1 - reserved, 2 - sold
  * @property int $price
- * @property int $int_sq
- * @property int|null $ext_sq
+ * @property string $int_sq
+ * @property string|null $ext_sq
  * @property int $bad
  * @property int $bath
  * @property int|null $bmr
  * @property int|null $parking
  * @property int|null $hoa
- * @property string|null $mark_x
- * @property string|null $mark_y
+ * @property int $mark
  * @property int|null $image_id
  *
+ * @property UnitMark[] $unitMarks
  * @property Images $image
  * @property Projects $project
  * @property Floors $floor
@@ -45,8 +45,8 @@ class Units extends \yii\db\ActiveRecord
     {
         return [
             [['project_id', 'unit_number', 'price', 'int_sq', 'bad', 'bath'], 'required'],
-            [['project_id', 'floor_id', 'unit_number', 'status', 'price', 'int_sq', 'ext_sq', 'bad', 'bath', 'bmr', 'parking', 'hoa', 'image_id'], 'integer'],
-            [['mark_x', 'mark_y'], 'string', 'max' => 128],
+            [['project_id', 'floor_id', 'unit_number', 'status', 'price', 'bad', 'bath', 'bmr', 'parking', 'hoa', 'mark', 'image_id'], 'integer'],
+            [['int_sq', 'ext_sq'], 'string', 'max' => 256],
             [['image_id'], 'exist', 'skipOnError' => true, 'targetClass' => Images::className(), 'targetAttribute' => ['image_id' => 'id']],
             [['project_id'], 'exist', 'skipOnError' => true, 'targetClass' => Projects::className(), 'targetAttribute' => ['project_id' => 'id']],
             [['floor_id'], 'exist', 'skipOnError' => true, 'targetClass' => Floors::className(), 'targetAttribute' => ['floor_id' => 'id']],
@@ -72,10 +72,19 @@ class Units extends \yii\db\ActiveRecord
             'bmr' => 'Bmr',
             'parking' => 'Parking',
             'hoa' => 'Hoa',
-            'mark_x' => 'Mark X',
-            'mark_y' => 'Mark Y',
+            'mark' => 'Mark',
             'image_id' => 'Image ID',
         ];
+    }
+
+    /**
+     * Gets query for [[UnitMarks]].
+     *
+     * @return \yii\db\ActiveQuery
+     */
+    public function getUnitMarks()
+    {
+        return $this->hasMany(UnitMark::className(), ['unit_id' => 'id']);
     }
 
     /**
