@@ -91,10 +91,12 @@ class AuthorisationController extends BaseController
         $model = new Users();
         $result = (object)[];
         $user = $model->findOne(['email' => $data->email, 'password' => md5($data->password), 'confirmed' => 1]);
+        $ip = $this->getIp();
         if($user != NULL) {
             $user->login_token = md5($data->email . time());
             $user->last_sign_in_at =  date('Y-m-d H:i:s');
             $user->confirmation_sent_at =  date('Y-m-d H:i:s');
+            $user->ip = $ip;
             $user->save();
             $result->ok = 1;
             $result->user = (object)[];
@@ -104,6 +106,7 @@ class AuthorisationController extends BaseController
             $result->user->uid = $user->uid;
             $result->user->company = $user->company;
             $result->token = $user->login_token;
+            $result->user->ip = $user->ip;
             $result->user->paid = strtotime($user->paid_up_to);
         } else {
             $user = $model->findOne(['email' => $data->email, 'password' => md5($data->password)]);

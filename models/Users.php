@@ -21,6 +21,7 @@ use Yii;
  * @property string|null $confirmed_at
  * @property int $confirmed
  * @property string|null $paid_up_to
+ * @property string|null $ip
  *
  * @property Projects[] $projects
  */
@@ -45,6 +46,7 @@ class Users extends \yii\db\ActiveRecord
             [['last_sign_in_at', 'confirmation_sent_at', 'confirmed_at', 'paid_up_to'], 'safe'],
             [['confirmed'], 'integer'],
             [['password', 'login_token', 'confirmation_token'], 'string', 'max' => 400],
+            [['ip'], 'string', 'max' => 128],
         ];
     }
 
@@ -68,6 +70,7 @@ class Users extends \yii\db\ActiveRecord
             'confirmed_at' => 'Confirmed At',
             'confirmed' => 'Confirmed',
             'paid_up_to' => 'Paid Up To',
+            'ip' => 'Ip',
         ];
     }
 

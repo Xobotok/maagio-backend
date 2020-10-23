@@ -40,6 +40,7 @@ class MarkerController extends BaseController
         $model->lat = (string)$marker->lat;
         $model->lng = (string)$marker->lng;
         $model->project_id = $data->project_id;
+        $model->type = (int)$marker->type;
         if(isset($marker->name) && $marker->name != null) {
             $model->name = (string)$marker->name;
         }
@@ -121,6 +122,10 @@ class MarkerController extends BaseController
     }
     public static function CreateMarkers($lat, $lng, $project_id) {
         $model = MapMarkers::find()->where(['project_id' => $project_id, 'creator' => 1])->asArray()->all();
+        foreach ($model as $place) {
+            $place_obj = MapMarkers::findOne($place['id']);
+            $place_obj->delete();
+        }
         $result = (object)[];
         $restaraunts = MarkerController::createType($lat, $lng,['restaurant'], 500);
         $culture = MarkerController::createType($lat, $lng, ['zoo', 'art_gallery', 'museum', 'night_club', 'movie_theater', 'library'], 500);

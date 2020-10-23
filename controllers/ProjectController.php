@@ -48,6 +48,12 @@ class ProjectController extends BaseController
     {
         $data = (object)yii::$app->request->get();
         $result = (object)[];
+        $authorisation = $this->checkAuthorisation($data->user_id, $data->token);
+        if ($authorisation->ok === 0) {
+            $result->ok = 0;
+            $result->message = 'Authorisation failed';
+            return json_encode($result);
+        }
         $model = new Users();
         $user = $model->find()->where(['uid' => $data->user_id, 'login_token' => $data->token])->one();
         if ($user !== NULL) {
@@ -233,7 +239,8 @@ class ProjectController extends BaseController
     {
         $data = (object)yii::$app->request->post();
         $result = (object)[];
-        if ($this->checkAuthorisation($data->user_id, $data->token)->ok === 0) {
+        $authorisation = $this->checkAuthorisation($data->user_id, $data->token);
+        if ($authorisation->ok === 0) {
             $result->ok = 0;
             $result->message = 'Authorisation failed';
             return json_encode($result);
@@ -283,10 +290,13 @@ class ProjectController extends BaseController
     {
         $data = (object)yii::$app->request->get();
         $result = (object)[];
-        if ($this->checkAuthorisation($data->user_id, $data->token)->ok === 0) {
+        $authorisation = $this->checkAuthorisation($data->user_id, $data->token);
+        if ($authorisation->ok === 0) {
             $result->ok = 0;
             $result->message = 'Authorisation failed';
             return json_encode($result);
+        } else {
+            $result->ip = $authorisation->ip;
         }
         $project = ProjectController::getProjectById((int)$data->project_id);
         $result->ok = 1;
