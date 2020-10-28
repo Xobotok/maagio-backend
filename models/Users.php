@@ -15,15 +15,18 @@ use Yii;
  * @property string|null $company
  * @property string|null $login_token
  * @property string $last_sign_in_at
- * @property string|null $last_sign_in_ip
  * @property string|null $confirmation_token
  * @property string $confirmation_sent_at
  * @property string|null $confirmed_at
  * @property int $confirmed
- * @property string|null $paid_up_to
+ * @property int|null $last_payment_id
  * @property string|null $ip
+ * @property string|null $end_tariff_date
+ * @property string|null $stripe_customer_id
  *
+ * @property Payment[] $payments
  * @property Projects[] $projects
+ * @property Payment $lastPayment
  */
 class Users extends \yii\db\ActiveRecord
 {
@@ -42,11 +45,12 @@ class Users extends \yii\db\ActiveRecord
     {
         return [
             [['email', 'password', 'first_name'], 'required'],
-            [['email', 'first_name', 'last_name', 'company', 'last_sign_in_ip'], 'string'],
-            [['last_sign_in_at', 'confirmation_sent_at', 'confirmed_at', 'paid_up_to'], 'safe'],
-            [['confirmed'], 'integer'],
+            [['email', 'first_name', 'last_name', 'company'], 'string'],
+            [['last_sign_in_at', 'confirmation_sent_at', 'confirmed_at', 'end_tariff_date'], 'safe'],
+            [['confirmed', 'last_payment_id'], 'integer'],
             [['password', 'login_token', 'confirmation_token'], 'string', 'max' => 400],
-            [['ip'], 'string', 'max' => 128],
+            [['ip', 'stripe_customer_id'], 'string', 'max' => 128],
+            [['last_payment_id'], 'exist', 'skipOnError' => true, 'targetClass' => Payment::className(), 'targetAttribute' => ['last_payment_id' => 'id']],
         ];
     }
 
@@ -64,14 +68,25 @@ class Users extends \yii\db\ActiveRecord
             'company' => 'Company',
             'login_token' => 'Login Token',
             'last_sign_in_at' => 'Last Sign In At',
-            'last_sign_in_ip' => 'Last Sign In Ip',
             'confirmation_token' => 'Confirmation Token',
             'confirmation_sent_at' => 'Confirmation Sent At',
             'confirmed_at' => 'Confirmed At',
             'confirmed' => 'Confirmed',
-            'paid_up_to' => 'Paid Up To',
+            'last_payment_id' => 'Last Payment ID',
             'ip' => 'Ip',
+            'end_tariff_date' => 'End Tariff Date',
+            'stripe_customer_id' => 'Stripe Customer ID',
         ];
+    }
+
+    /**
+     * Gets query for [[Payments]].
+     *
+     * @return \yii\db\ActiveQuery
+     */
+    public function getPayments()
+    {
+        return $this->hasMany(Payment::className(), ['user_id' => 'uid']);
     }
 
     /**
@@ -82,5 +97,15 @@ class Users extends \yii\db\ActiveRecord
     public function getProjects()
     {
         return $this->hasMany(Projects::className(), ['user_id' => 'uid']);
+    }
+
+    /**
+     * Gets query for [[LastPayment]].
+     *
+     * @return \yii\db\ActiveQuery
+     */
+    public function getLastPayment()
+    {
+        return $this->hasOne(Payment::className(), ['id' => 'last_payment_id']);
     }
 }
