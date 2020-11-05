@@ -16,7 +16,6 @@ use Yii;
  *
  * @property Users $user
  * @property Tariff $tariff
- * @property Users[] $users
  */
 class Payment extends \yii\db\ActiveRecord
 {
@@ -77,15 +76,5 @@ class Payment extends \yii\db\ActiveRecord
     public function getTariff()
     {
         return $this->hasOne(Tariff::className(), ['id' => 'tariff_id']);
-    }
-
-    /**
-     * Gets query for [[Users]].
-     *
-     * @return \yii\db\ActiveQuery
-     */
-    public function getUsers()
-    {
-        return $this->hasMany(Users::className(), ['last_payment_id' => 'id']);
     }
 }

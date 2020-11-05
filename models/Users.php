@@ -19,14 +19,12 @@ use Yii;
  * @property string $confirmation_sent_at
  * @property string|null $confirmed_at
  * @property int $confirmed
- * @property int|null $last_payment_id
+ * @property string|null $subscribe_id
  * @property string|null $ip
- * @property string|null $end_tariff_date
+ * @property string|null $end_trial_date
  * @property string|null $stripe_customer_id
  *
- * @property Payment[] $payments
  * @property Projects[] $projects
- * @property Payment $lastPayment
  */
 class Users extends \yii\db\ActiveRecord
 {
@@ -46,11 +44,10 @@ class Users extends \yii\db\ActiveRecord
         return [
             [['email', 'password', 'first_name'], 'required'],
             [['email', 'first_name', 'last_name', 'company'], 'string'],
-            [['last_sign_in_at', 'confirmation_sent_at', 'confirmed_at', 'end_tariff_date'], 'safe'],
-            [['confirmed', 'last_payment_id'], 'integer'],
+            [['last_sign_in_at', 'confirmation_sent_at', 'confirmed_at', 'end_trial_date'], 'safe'],
+            [['confirmed'], 'integer'],
             [['password', 'login_token', 'confirmation_token'], 'string', 'max' => 400],
-            [['ip', 'stripe_customer_id'], 'string', 'max' => 128],
-            [['last_payment_id'], 'exist', 'skipOnError' => true, 'targetClass' => Payment::className(), 'targetAttribute' => ['last_payment_id' => 'id']],
+            [['subscribe_id', 'ip', 'stripe_customer_id'], 'string', 'max' => 128],
         ];
     }
 
@@ -72,21 +69,11 @@ class Users extends \yii\db\ActiveRecord
             'confirmation_sent_at' => 'Confirmation Sent At',
             'confirmed_at' => 'Confirmed At',
             'confirmed' => 'Confirmed',
-            'last_payment_id' => 'Last Payment ID',
+            'subscribe_id' => 'Subscribe ID',
             'ip' => 'Ip',
-            'end_tariff_date' => 'End Tariff Date',
+            'end_trial_date' => 'End Trial Date',
             'stripe_customer_id' => 'Stripe Customer ID',
         ];
-    }
-
-    /**
-     * Gets query for [[Payments]].
-     *
-     * @return \yii\db\ActiveQuery
-     */
-    public function getPayments()
-    {
-        return $this->hasMany(Payment::className(), ['user_id' => 'uid']);
     }
 
     /**
@@ -97,15 +84,5 @@ class Users extends \yii\db\ActiveRecord
     public function getProjects()
     {
         return $this->hasMany(Projects::className(), ['user_id' => 'uid']);
-    }
-
-    /**
-     * Gets query for [[LastPayment]].
-     *
-     * @return \yii\db\ActiveQuery
-     */
-    public function getLastPayment()
-    {
-        return $this->hasOne(Payment::className(), ['id' => 'last_payment_id']);
     }
 }

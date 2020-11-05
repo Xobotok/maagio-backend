@@ -58,7 +58,7 @@ class MapController extends BaseController
             $map->save();
             $result->ok = 1;
             $result->map = $map->attributes;
-            MarkerController::CreateMarkers($map->lat, $map->lng, $data->project_id);
+          /*  MarkerController::CreateMarkers($map->lat, $map->lng, $data->project_id);*/
             return json_encode($result);
         }
         $result->ok = 0;
@@ -78,34 +78,5 @@ class MapController extends BaseController
        $result->ok = 1;
        $result->predictions = $new_map->predictions;
         return json_encode($result);
-    }
-    public function actionSearchPlace() {
-        $data = (object)yii::$app->request->post();
-        $query = 'https://maps.googleapis.com/maps/api/geocode/json?address=' . $data->input . '&key=AIzaSyDEzKHEUbk3ocLvIgBGMOsJjguHEj0LR4s';
-        $result = file_get_contents($query);
-        $result = json_decode($result);
-        $data = (object)[];
-        if(isset($result->status) && $result->status == 'OK') {
-            $data->result = $result->results;
-            $data->ok = 1;
-        } else {
-            $data->ok = 0;
-            $data->message = 'Nothing found';
-        }
-        return json_encode($data);
-    }
-    public function actionSearchNearPlaces() {
-        $query = 'https://maps.googleapis.com/maps/api/place/nearbysearch/json?location=-33.8670522,151.1957362&radius=500&type=food&key=AIzaSyDEzKHEUbk3ocLvIgBGMOsJjguHEj0LR4s';
-        $result = file_get_contents($query);
-        $result = json_decode($result);
-        $data = (object)[];
-        if(isset($result->status) && $result->status == 'OK') {
-            $data->result = $result->results;
-            $data->ok = 1;
-        } else {
-            $data->ok = 0;
-            $data->message = 'Nothing found';
-        }
-        return json_encode($data);
     }
 }

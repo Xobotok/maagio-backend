@@ -13,8 +13,6 @@ use yii\web\Response;
 use yii\filters\VerbFilter;
 use app\models\LoginForm;
 use app\models\ContactForm;
-/*const PATH_TO_IMAGE = 'https://backend.getmaggio.com/web/image_storage/uploads/';*/
-const PATH_TO_IMAGE = 'http://web/image_storage/uploads/';
 
 class ImageController extends BaseController
 {
@@ -99,7 +97,7 @@ class ImageController extends BaseController
         if( move_uploaded_file( $image['tmp_name'], "$uploaddir/$file_name" ) ){
             $done_files[] = realpath( "$uploaddir/$file_name" );
             $image_model = new Images();
-            $image_model->image_link = PATH_TO_IMAGE .$file_name;
+            $image_model->image_link = BaseController::$PATH_TO_IMAGE .$file_name;
             $image_model->name = $image['name'];
             $image_model->save();
             return $image_model;

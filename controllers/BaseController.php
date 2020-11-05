@@ -1,6 +1,7 @@
 <?php
 
 namespace app\controllers;
+require_once 'Constants.php';
 
 use app\models\Users;
 use Yii;
@@ -13,6 +14,7 @@ use app\models\ContactForm;
 
 class BaseController extends Controller
 {
+    public static $PATH_TO_IMAGE = PATH_TO_IMAGE;
     public $enableCsrfValidation = false;
 
     public function beforeAction($action)
