@@ -93,10 +93,8 @@ class PaymentController extends BaseController
            $pay = $stripe->paymentMethods->retrieve($payment->id);
            $pay->detach();
        }
-       $user->subscribe_id = null;
        $user->save();
        $result->ok = 1;
-       $result->subsctibe_id = $user->subscribe_id;
        $result->subscribe = $subscribe;
        return json_encode($result);
    }
@@ -166,10 +164,8 @@ class PaymentController extends BaseController
                ]],
            ]);
        }
-       $user->subscribe_id = $subscribe->id;
        $user->save();
        $result->ok = 1;
-       $result->subscribe_id = $user->subscribe_id;
        $result->subscribe = $subscribe;
        return json_encode($result);
    }
