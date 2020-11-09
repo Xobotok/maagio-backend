@@ -29,10 +29,6 @@ class AuthorisationController extends BaseController
             ],
         ];
     }
-    public function actionIndex() {
-
-
-    }
     public function actionTakeUserInfo() {
         $data = (object)yii::$app->request->get();
         $result = (object)[];
@@ -42,41 +38,20 @@ class AuthorisationController extends BaseController
             $result->message = 'Authorisation failed';
             return json_encode($result);
         }
+        $stripe = new \Stripe\StripeClient(
+            STRIPE_LIVE_KEY
+        );
         $user = Users::findOne($data->user['uid']);
-        if($user->end_trial_date != null) {
-            $end_time = strtotime($user->end_trial_date) - strtotime(date("Y-m-d H:i:s"));
-        } else {
-            $end_time = 0;
-        }
+        $customer = PaymentController::takeStripeCustomer($user->uid);
+        $result->subscribe = $customer->subscriptions->data[0];
         $tariffs =  TariffController::takeAllTariffs();
-        $result->end_time =$end_time;
-        $result->subscribe_id = $user->subscribe_id;
+        $end_time = $result->subscribe->current_period_end - strtotime(date("Y-m-d H:i:s"));
+        $result->end_time = $end_time;
         $result->tariffs = $tariffs;
+        $result->user = (object)['name' =>$user->first_name, 'last_name' => $user->last_name, 'company' => $user->company, 'email' => $user->email];
         $result->actual_tariff = $tariffs[0];
         $result->ok = 1;
         return json_encode($result);
-    }
-    public function actionTakeEndTariff() {
-        $data = (object)yii::$app->request->get();
-        $result = (object)[];
-        $authorisation = $this->checkAuthorisation($data->user['uid'], $data->token);
-        if ($authorisation->ok === 0) {
-            $result->ok = 0;
-            $result->message = 'Authorisation failed';
-            return json_encode($result);
-        }
-        $user = Users::findOne($data->user['uid']);
-        if($user->end_trial_date != null) {
-            $end_time = strtotime($user->end_trial_date) - strtotime(date("Y-m-d H:i:s"));
-        } else {
-            $end_time = 0;
-        }
-        $result->end_time =$end_time;
-        $result->ok = 1;
-        return json_encode($result);
-    }
-    public function actionGetBuildings() {
-
     }
     public function actionRegister() {
         $data = (object)yii::$app->request->get();
@@ -113,7 +88,7 @@ class AuthorisationController extends BaseController
                 ->setFrom(['no-reply@maggio.app' => 'Maagio account confirm'])
                 ->setTo($user->email)
                 ->setSubject('Welcome to Maagio')
-                ->setHtmlBody('<p>For activate your Maagio Account click </p><b><a href="http://hareapj.cluster051.hosting.ovh.net/#/confirm/?confirm_token='.$user->confirmation_token.'">here</a></b>');
+                ->setHtmlBody('<p>For activate your Maagio Account click </p><b><a href="'.FRONTEND_URL.'/#/confirm/?confirm_token='.$user->confirmation_token.'">here</a></b>');
             $mailer->getSwiftMailer()->registerPlugin(new Swift_Plugins_LoggerPlugin($logger));
             try{
                 $message->send();
@@ -130,19 +105,6 @@ class AuthorisationController extends BaseController
         }
         return json_encode($result);
     }
-    public function actionTest() {
-        return var_dump(AuthorisationController::checkSubscribe(1));
-    }
-    public static function checkSubscribe($user_id) {
-        $customer = PaymentController::takeStripeCustomer($user_id);
-        $subscriptions = $customer->subscriptions->data;
-        return var_dump($subscriptions);
-        if($subscriptions != NULL && count($subscriptions) > 0) {
-            return true;
-        } else {
-            return false;
-        }
-    }
     public function actionLogin() {
         $data = (object)yii::$app->request->get();
         $model = new Users();
@@ -158,36 +120,17 @@ class AuthorisationController extends BaseController
             $user->last_sign_in_at =  date('Y-m-d H:i:s');
             $user->confirmation_sent_at =  date('Y-m-d H:i:s');
             $user->ip = $ip;
-            if($user->stripe_customer_id != null){
-                try {
-                    $customer = $stripe->customers->retrieve($user->stripe_customer_id, []);
-
-                } catch (\Stripe\Exception\InvalidRequestException $n) {
-                    $customer = \Stripe\Customer::create([
-                        'email' => $user->email,
-                    ]);
-                    $user->stripe_customer_id = $customer->id;
-                    $user->save();
-                }
-            } else {
-                $customer = \Stripe\Customer::create([
-                    'email' => $user->email,
-                ]);
-                $user->stripe_customer_id = $customer->id;
-                $user->save();
-            }
-
-            if($user->end_trial_date == null) {
+            $customer = PaymentController::takeStripeCustomer($user->uid);
+            if(!isset($customer->subscriptions->data[0])) {
                 $subscription = \Stripe\Subscription::create([
                     'customer' => $user->stripe_customer_id,
                     'items' => [
                         [
-                            'price' => 'price_1Hk4MbC3fcSx3Qt9gx1kGMVS',
+                            'price' => DEFAULT_STRIPE_PRICE,
                         ],
                     ],
                     'trial_end' => strtotime(date('Y-m-d H:i:s'))  + 60 * 60 * 24 * 90,
                 ]);
-                $user->end_trial_date = date('Y-m-d H:i:s', strtotime(date('Y-m-d H:i:s')) + 60 * 60 * 24 * 90);
             }
             $user->save();
             $result->ok = 1;
@@ -199,8 +142,6 @@ class AuthorisationController extends BaseController
             $result->user->company = $user->company;
             $result->token = $user->login_token;
             $result->user->ip = $user->ip;
-            $result->user->subscribe_id = $user->subscribe_id;
-            $result->user->paid = strtotime($user->end_trial_date);
         } else {
             $user = $model->findOne(['email' => $data->email, 'password' => md5($data->password)]);
             if($user != NULL) {

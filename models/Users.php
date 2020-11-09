@@ -19,9 +19,7 @@ use Yii;
  * @property string $confirmation_sent_at
  * @property string|null $confirmed_at
  * @property int $confirmed
- * @property string|null $subscribe_id
  * @property string|null $ip
- * @property string|null $end_trial_date
  * @property string|null $stripe_customer_id
  *
  * @property Projects[] $projects
@@ -44,10 +42,10 @@ class Users extends \yii\db\ActiveRecord
         return [
             [['email', 'password', 'first_name'], 'required'],
             [['email', 'first_name', 'last_name', 'company'], 'string'],
-            [['last_sign_in_at', 'confirmation_sent_at', 'confirmed_at', 'end_trial_date'], 'safe'],
+            [['last_sign_in_at', 'confirmation_sent_at', 'confirmed_at'], 'safe'],
             [['confirmed'], 'integer'],
             [['password', 'login_token', 'confirmation_token'], 'string', 'max' => 400],
-            [['subscribe_id', 'ip', 'stripe_customer_id'], 'string', 'max' => 128],
+            [['ip', 'stripe_customer_id'], 'string', 'max' => 128],
         ];
     }
 
@@ -69,9 +67,7 @@ class Users extends \yii\db\ActiveRecord
             'confirmation_sent_at' => 'Confirmation Sent At',
             'confirmed_at' => 'Confirmed At',
             'confirmed' => 'Confirmed',
-            'subscribe_id' => 'Subscribe ID',
             'ip' => 'Ip',
-            'end_trial_date' => 'End Trial Date',
             'stripe_customer_id' => 'Stripe Customer ID',
         ];
     }
