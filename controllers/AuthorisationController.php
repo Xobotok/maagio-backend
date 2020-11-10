@@ -123,7 +123,8 @@ class AuthorisationController extends BaseController
             $customer = PaymentController::takeStripeCustomer($user->uid);
             if(!isset($customer->subscriptions->data[0])) {
                 $subscription = \Stripe\Subscription::create([
-                    'customer' => $user->stripe_customer_id,
+                    'customer' => $customer->id,
+                    'cancel_at_period_end' => true,
                     'items' => [
                         [
                             'price' => DEFAULT_STRIPE_PRICE,

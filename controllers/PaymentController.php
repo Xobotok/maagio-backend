@@ -36,6 +36,13 @@ class PaymentController extends BaseController
                    $user->stripe_customer_id,
                    []
                );
+               if($customer->deleted == true) {
+                   $customer = \Stripe\Customer::create([
+                       'email' => $user->email,
+                   ]);
+                   $user->stripe_customer_id = $customer->id;
+                   $user->save();
+               }
            } catch(\Stripe\Exception\InvalidRequestException $e) {
                $customer = \Stripe\Customer::create([
                    'email' => $user->email,
