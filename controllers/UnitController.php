@@ -131,7 +131,7 @@ class UnitController extends BaseController
                 $unit_mark = UnitMark::find()->where(['unit_id' => $unit['id']])->one();
                 $units[$key]['unit_mark'] = $unit_mark->attributes;
             } else {
-                $units[$key]['unit_mark'] = (object)['id'=> 0, 'width' => 150, 'height' => 100, 'x' => 0, 'y' => 0, 'font_size' => 16];
+                $units[$key]['unit_mark'] = null;
             }
         }
         return $units;
