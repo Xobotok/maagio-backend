@@ -361,6 +361,7 @@ class ProjectController extends BaseController
         $project->save();
         $result->ok = 1;
         $result->published = $project->published;
+        $result->project = $project->attributes;
         $result->personal_link = $project->special_link;
         return json_encode($result);
     }

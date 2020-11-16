@@ -65,7 +65,10 @@ class UnitController extends BaseController
             $unitModel = new Units();
         }
         $unitModel->unit_number = (int)$unit->unit_number;
-        $unitModel->floor_id = (int)$unit->floor;
+        if((int)$unitModel->floor_id != (int)$unit->floor) {
+            $unitModel->floor_id = (int)$unit->floor;
+            $newFloor = Floors::findOne((int)$unit->floor)->number;
+        }
         $unitModel->project_id = (int)$data->project_id;
         $unitModel->bad = (int)$unit->bad;
         $unitModel->bath = (int)$unit->bath;
@@ -80,6 +83,10 @@ class UnitController extends BaseController
             $unitModel->mark = 1;
         } else {
             $unitModel->mark = 0;
+            $mark = UnitMark::find()->where(['unit_id' => $unitModel->id])->one();
+            if($mark != NULL) {
+                $mark->delete();
+            }
         }
         $unitModel->save();
         if($unit->mark == true) {
@@ -110,6 +117,9 @@ class UnitController extends BaseController
             $result->unit['unit_mark'] = $markModel->attributes;
         } else if(isset($markModel) && count($markModel->errors) > 0) {
             $result->unit['unit_mark'] = $markModel->oldAttributes;
+        }
+        if(isset($newFloor)) {
+            $result->unit['newFloor'] = $newFloor;
         }
         return json_encode($result);
     }
