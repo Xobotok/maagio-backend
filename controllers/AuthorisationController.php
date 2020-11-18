@@ -133,6 +133,7 @@ class AuthorisationController extends BaseController
                     'trial_end' => strtotime(date('Y-m-d H:i:s'))  + 60 * 60 * 24 * 90,
                 ]);
             }
+            $user->password_restore_token = null;
             $user->save();
             $result->ok = 1;
             $result->user = (object)[];

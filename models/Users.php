@@ -21,6 +21,7 @@ use Yii;
  * @property int $confirmed
  * @property string|null $ip
  * @property string|null $stripe_customer_id
+ * @property string|null $password_restore_token
  *
  * @property Projects[] $projects
  */
@@ -45,7 +46,7 @@ class Users extends \yii\db\ActiveRecord
             [['last_sign_in_at', 'confirmation_sent_at', 'confirmed_at'], 'safe'],
             [['confirmed'], 'integer'],
             [['password', 'login_token', 'confirmation_token'], 'string', 'max' => 400],
-            [['ip', 'stripe_customer_id'], 'string', 'max' => 128],
+            [['ip', 'stripe_customer_id', 'password_restore_token'], 'string', 'max' => 128],
         ];
     }
 
@@ -69,6 +70,7 @@ class Users extends \yii\db\ActiveRecord
             'confirmed' => 'Confirmed',
             'ip' => 'Ip',
             'stripe_customer_id' => 'Stripe Customer ID',
+            'password_restore_token' => 'Password Restore Token',
         ];
     }
 
