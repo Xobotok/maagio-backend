@@ -7,3 +7,4 @@ define("PATH_TO_IMAGE",     "https://backend.getmaggio.com/web/image_storage/upl
 define("FRONTEND_URL",     "https://getmaggio.com");
 /*define("FRONTEND_URL",     "http://localhost:8080/");*/
 define("DEFAULT_STRIPE_PRICE",     "price_1HjKKoC3fcSx3Qt9fZ3c1cWo");
+define('GOOGLE_API_KEY', 'AIzaSyC6lQwcXfErTiV4I9xG9nB3n6sb-5CunaA');

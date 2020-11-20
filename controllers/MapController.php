@@ -58,7 +58,6 @@ class MapController extends BaseController
             $map->save();
             $result->ok = 1;
             $result->map = $map->attributes;
-          /*  MarkerController::CreateMarkers($map->lat, $map->lng, $data->project_id);*/
             return json_encode($result);
         }
         $result->ok = 0;
