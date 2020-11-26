@@ -151,9 +151,16 @@ class ProjectController extends BaseController
             $project->save();
 
         }
+        if($project->project_logo != null) {
+            $img = Images::findOne($project->project_logo);
+        } else {
+            $img = (object)[];
+            $img->image_link = '';
+        }
         $project->save();
         $result->ok = 1;
         $result->project = $project->attributes;
+        $result->project['logo_link'] = $img->image_link;
         return json_encode($result);
     }
     private function splitImages($files)
@@ -349,14 +356,17 @@ class ProjectController extends BaseController
             return json_encode($authorisation);
         }
         $project =Projects::findOne($data->project_id);
+        if( $project->special_link == null) {
+            $project_link = md5($project->id . $project->name) . $project->id;
+            $project->special_link = $project_link;
+        }
+
         if($project->published == 1) {
             $project->published = 0;
         } else {
             $project->published = 1;
-        }
-        if( $project->special_link == null) {
-            $project_link = md5($project->id . $project->name) . $project->id;
-            $project->special_link = $project_link;
+           AppController::createManifest($project->special_link);
+
         }
         $project->save();
         $result->ok = 1;
