@@ -26,15 +26,6 @@ class ProjectController extends BaseController
 {
     public $enableCsrfValidation = false;
 
-    public function behaviors()
-    {
-        return [
-            'corsFilter' => [
-                'class' => \yii\filters\Cors::className(),
-            ],
-        ];
-    }
-
     public static function createProject($user_id, $project)
     {
         $model = new Projects();
