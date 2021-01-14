@@ -6,6 +6,7 @@ use app\models\Floors;
 use app\models\Galleries;
 use app\models\GalleryPhotos;
 use app\models\Images;
+use app\models\LotInfo;
 use app\models\MapMarkers;
 use app\models\Maps;
 use app\models\Projects;
@@ -148,6 +149,7 @@ class ProjectController extends BaseController
             $img = (object)[];
             $img->image_link = '';
         }
+        $project->house_type = $data->house_type;
         $project->save();
         $result->ok = 1;
         $result->project = $project->attributes;
@@ -215,6 +217,9 @@ class ProjectController extends BaseController
                 $image = Images::findOne($photo['image_id']);
                 $result_galleries[$key]['photos'][] = $image->image_link;
             }
+        }
+        if($project['house_type'] == 2) {
+            $project['lot_info'] = LotInfoController::getLotInfo($project['id']);
         }
         $project['galleries'] = $result_galleries;
         $model = new Maps();
@@ -319,7 +324,16 @@ class ProjectController extends BaseController
         }
         $project['floors'] = FloorController::getFloor($project['id']);
         $project['galleries'] = GalleryController::getGalleries($project['id']);
-        $unfloorUnits = UnitController::getUnfloorUnits($project['id']);
+        $unfloorUnits = [];
+        if($project['house_type'] != 2) {
+            $unfloorUnits = UnitController::getUnfloorUnits($project['id']);
+        }
+        if($project['house_type'] == 2) {
+            $project['lot_info'] = LotInfo::find()->where(['project_id' => $project['id']])->one()->attributes;
+            if($project['lot_info']['image_id'] != null) {
+                $project['lot_info']['image'] = Images::findOne($project['lot_info']['image_id'])->image_link;
+            }
+        }
         $project['markers'] = MarkerController::getMarkers($project['id']);
         if($unfloorUnits != null) {
             $project['unfloor_units'] = $unfloorUnits;

@@ -88,7 +88,7 @@ class AuthorisationController extends BaseController
                 ->setFrom(['no-reply@maggio.app' => 'Maagio account confirm'])
                 ->setTo($user->email)
                 ->setSubject('Welcome to Maagio')
-                ->setHtmlBody('<p>For activate your Maagio Account click </p><b><a href="'.FRONTEND_URL.'/#/confirm/?confirm_token='.$user->confirmation_token.'">here</a></b>');
+                ->setHtmlBody('<p>For activate your Maagio Account click </p><b><a href="'.FRONTEND_URL.'/confirm/?confirm_token='.$user->confirmation_token.'">here</a></b>');
             $mailer->getSwiftMailer()->registerPlugin(new Swift_Plugins_LoggerPlugin($logger));
             try{
                 $message->send();
@@ -162,6 +162,7 @@ class AuthorisationController extends BaseController
         $model = new Users();
         $result = (object)[];
         $user = $model->findOne(['confirmation_token' => $token]);
+
         if($user != NULL) {
             $user->confirmed = 1;
             $user->confirmation_token = '';

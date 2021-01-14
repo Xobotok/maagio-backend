@@ -31,7 +31,7 @@ class ImageController extends BaseController
 
     }
     public static function checkImage($photo) {
-        $formats = ['image/jpg', 'image/jpeg', 'image/png'];
+        $formats = ['image/jpg', 'image/jpeg', 'image/png', 'image'];
         $max_size = 10485760;
         $format_flag = false;
         $size_flag = false;
@@ -66,6 +66,7 @@ class ImageController extends BaseController
         if(file_exists($filePath)) {
             unlink($filePath);
         }
+
         $file->delete();
         $result->ok = 1;
         return $result;
@@ -90,9 +91,12 @@ class ImageController extends BaseController
             $file_name = $user_id . '_' .$project_id . '_gallery_'.$gallery_id . '_' . $image['size'].$image['name'];
         } else if($type === 'unit') {
             $file_name = $user_id . '_' .$project_id . '_floor_'.$floor_id . 'unit_' .$unit_id .'_'. $image['size'].$image['name'];
+        } else if($type === 'unit-photo') {
+            $file_name = $user_id . '_' .$project_id . '_unit_photo_' .$unit_id .'_'. $image['size'].$image['name'];
         } else {
             return false;
         }
+
         $file_name = str_replace(' ', '', $file_name);
         if( move_uploaded_file( $image['tmp_name'], "$uploaddir/$file_name" ) ){
             $done_files[] = realpath( "$uploaddir/$file_name" );

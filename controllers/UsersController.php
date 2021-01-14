@@ -66,7 +66,7 @@ class UsersController extends BaseController
            ->setFrom(['no-reply@maggio.app' => 'Maagio restore password'])
            ->setTo($data->email)
            ->setSubject('Maagio restore password')
-           ->setHtmlBody('<p>For restore your password click </p><b><a href="'.FRONTEND_URL.'/#/restore/?restore_token='.$user->password_restore_token.'">here</a></b>');
+           ->setHtmlBody('<p>For restore your password click </p><b><a href="'.FRONTEND_URL.'/restore/?restore_token='.$user->password_restore_token.'">here</a></b>');
        $mailer->getSwiftMailer()->registerPlugin(new Swift_Plugins_LoggerPlugin($logger));
        try{
            $message->send();
