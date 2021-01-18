@@ -5,6 +5,7 @@ namespace app\controllers;
 use app\models\Floors;
 use app\models\Images;
 use app\models\LotInfo;
+use app\models\LotPhotos;
 use app\models\UnitMark;
 use app\models\UnitPhotos;
 use app\models\Units;
@@ -207,6 +208,11 @@ class UnitController extends BaseController
         }
         if(isset($newFloor)) {
             $result->unit['newFloor'] = $newFloor;
+        }
+        if($data->house_type == 1) {
+            $result->unit['photos'] = UnitPhotos::find()->where(['unit_id' => $result->unit['id']])->asArray()->all();
+        } else {
+            $result->unit['photos'] = LotPhotos::find()->where(['lot_id' => $result->unit['id']])->asArray()->all();
         }
         return json_encode($result);
     }
