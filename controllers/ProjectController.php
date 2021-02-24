@@ -10,6 +10,7 @@ use app\models\LotInfo;
 use app\models\MapMarkers;
 use app\models\Maps;
 use app\models\Projects;
+use app\models\Template;
 use app\models\Units;
 use app\models\Users;
 use Faker\Provider\Image;
@@ -150,6 +151,7 @@ class ProjectController extends BaseController
             $img->image_link = '';
         }
         $project->house_type = $data->house_type;
+        $project->template_id = (int)$data->template_id;
         $project->save();
         $result->ok = 1;
         $result->project = $project->attributes;
@@ -230,6 +232,7 @@ class ProjectController extends BaseController
         if (isset($map['lat'])) {
             $map['lat'] = (double)$map['lat'];
         }
+        $project['template'] = Template::findOne($project['template_id'])->attributes;
         $project['map'] = $map;
         $project['markers']['user_marker'] = MapMarkers::find()->where(['project_id' => $project['id'], 'creator' => 0])->asArray()->all();
         $project['markers']['automation_marker'] = MapMarkers::find()->where(['project_id' => $project['id'], 'creator' => 1, 'show_marker' => 1])->asArray()->all();
@@ -351,6 +354,9 @@ class ProjectController extends BaseController
         } else {
             $project['map'] = '';
         }
+        $template = Template::findOne($project['template_id']);
+        $project['template'] = $template->attributes;
+        $project['all_templates'] = Template::find()->asArray()->all();
         return $project;
     }
     public function actionPublish() {
