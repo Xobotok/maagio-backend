@@ -63,9 +63,9 @@ class UsersController extends BaseController
        $logger = new Swift_Plugins_Loggers_ArrayLogger();
        $mailer = Yii::$app->get('mailer');
        $message  = Yii::$app->mailer->compose()
-           ->setFrom(['no-reply@maggio.app' => 'Maagio restore password'])
+           ->setFrom(['no-reply@maggio.app' => 'Maggio restore password'])
            ->setTo($data->email)
-           ->setSubject('Maagio restore password')
+           ->setSubject('Maggio restore password')
            ->setHtmlBody('<p>For restore your password click </p><b><a href="'.FRONTEND_URL.'/restore/?restore_token='.$user->password_restore_token.'">here</a></b>');
        $mailer->getSwiftMailer()->registerPlugin(new Swift_Plugins_LoggerPlugin($logger));
        try{

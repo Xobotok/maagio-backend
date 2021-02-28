@@ -85,9 +85,9 @@ class AuthorisationController extends BaseController
             $logger = new Swift_Plugins_Loggers_ArrayLogger();
             $mailer = Yii::$app->get('mailer');
             $message  = Yii::$app->mailer->compose()
-                ->setFrom(['no-reply@maggio.app' => 'Maagio account confirm'])
+                ->setFrom(['no-reply@maggio.app' => 'Maggio account confirm'])
                 ->setTo($user->email)
-                ->setSubject('Welcome to Maagio')
+                ->setSubject('Welcome to Maggio')
                 ->setHtmlBody('<p>For activate your Maagio Account click </p><b><a href="'.FRONTEND_URL.'/confirm/?confirm_token='.$user->confirmation_token.'">here</a></b>');
             $mailer->getSwiftMailer()->registerPlugin(new Swift_Plugins_LoggerPlugin($logger));
             try{
