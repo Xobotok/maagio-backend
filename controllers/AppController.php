@@ -17,7 +17,7 @@ class AppController extends BaseController
         $result = (object)[];
 
         $url = ((!empty($_SERVER['HTTPS'])) ? 'https' : 'http') . '://' . $_SERVER['HTTP_HOST'];
-        $url = explode('?', $url);
+        $url = explode('/', $url);
         $url = $url[0];
         $project = Projects::find()->where(['special_link' => $project_id])->one();
         $url = $url . '/manifests/' . $project_id.'.json';
