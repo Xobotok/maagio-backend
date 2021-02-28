@@ -58,12 +58,17 @@ class AuthorisationController extends BaseController
         $result = (object)[];
         $model = new Users();
         $check = $model->findOne(['email' => $data->email]);
-        if($check != NULL) {
+        if($check != NULL && $check->attributes['confirmed'] == 1) {
             $result->ok = 0;
             $result->error = 'Email already exist';
         } else {
-            $user = new Users();
-            $user->loadDefaultValues();
+            if($check != NULL) {
+                $user = Users::findOne($check->attributes['uid']);
+            } else {
+                $user = new Users();
+                $user->loadDefaultValues();
+            }
+
             if($data->email != '') {
                 $user->email = $data->email;
             }
@@ -99,7 +104,6 @@ class AuthorisationController extends BaseController
                 return json_encode($result);
             }
             $user->save();
-
             $result->ok = 1;
             $result->message = 'Confirm your email address and log in';
         }
